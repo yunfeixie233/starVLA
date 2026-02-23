@@ -22,7 +22,6 @@ import os
 import sys
 import time
 
-import numpy as np
 import torch
 from PIL import Image
 
@@ -46,7 +45,7 @@ def masked_mean_pool(hidden_states, attention_mask):
     return (h * m).sum(dim=1) / m.sum(dim=1).clamp(min=1)
 
 
-def extract_feat_a(model, images_pil, instruction, device):
+def extract_feat_a(model, images_pil, instruction):
     """Run VLM prefill and extract mean-pooled last hidden state.
 
     This function is shared across all 4 StarVLA frameworks.
@@ -54,10 +53,9 @@ def extract_feat_a(model, images_pil, instruction, device):
     the framework's forward() or predict_action() methods.
 
     Args:
-        model: A loaded StarVLA framework instance.
+        model: A loaded StarVLA framework instance (already on device).
         images_pil: List[PIL.Image] for a single sample (e.g., [img_0]).
         instruction: str task instruction.
-        device: torch.device
 
     Returns:
         feat_a: (D,) float32 tensor on CPU.
@@ -115,9 +113,9 @@ def main():
 
     partial_path = os.path.join(args.output_dir, "feats_A_partial.pt")
     if args.resume_from > 0 and os.path.exists(partial_path):
-        feats_list = torch.load(partial_path, weights_only=True).tolist()
-        feats_list = [torch.tensor(f) for f in feats_list[:args.resume_from]]
-        print(f"  Resuming from sample {args.resume_from}")
+        partial_tensor = torch.load(partial_path, weights_only=True)
+        feats_list = list(partial_tensor[:args.resume_from])
+        print(f"  Resuming from sample {args.resume_from} ({len(feats_list)} loaded)")
     else:
         feats_list = []
         args.resume_from = 0
@@ -129,7 +127,7 @@ def main():
 
         instruction = task_descriptions[i]
 
-        feat_a = extract_feat_a(model, [img], instruction, args.device)
+        feat_a = extract_feat_a(model, [img], instruction)
         feats_list.append(feat_a)
 
         if (i + 1) % 100 == 0 or i == 0:

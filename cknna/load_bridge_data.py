@@ -84,6 +84,8 @@ def main():
     parser.add_argument("--num_samples", type=int, default=5000)
     parser.add_argument("--num_chunks", type=int, default=3,
                         help="Number of data chunks to download (1000 eps each)")
+    parser.add_argument("--total_chunks", type=int, default=54,
+                        help="Total number of chunks in the dataset (for even spacing)")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--cache_dir", type=str, default=None,
                         help="HuggingFace cache directory")
@@ -100,20 +102,28 @@ def main():
     tasks = download_tasks(args.cache_dir)
     print(f"  Found {len(tasks)} tasks")
 
+    step = max(1, args.total_chunks // args.num_chunks)
+    chunk_indices = [i * step for i in range(args.num_chunks) if i * step < args.total_chunks]
+    print(f"Selected chunks (evenly spaced): {chunk_indices}")
+
     all_frames = []
-    for chunk_idx in range(args.num_chunks):
+    for chunk_idx in chunk_indices:
         print(f"\nDownloading parquet chunk {chunk_idx}...")
         parquet_paths = download_parquet_chunk(chunk_idx, args.cache_dir)
         print(f"  Downloaded {len(parquet_paths)} parquet files")
 
         for pp in parquet_paths:
             df = pd.read_parquet(pp)
-            for _, row in df.iterrows():
+            ep_arr = df["episode_index"].values.astype(np.int64)
+            fr_arr = df["frame_index"].values.astype(np.int64)
+            ti_arr = df["task_index"].values.astype(np.int64)
+            st_arr = np.stack(df["observation.state"].values).astype(np.float32)
+            for j in range(len(df)):
                 all_frames.append({
-                    "episode_index": int(row["episode_index"]),
-                    "frame_index": int(row["frame_index"]),
-                    "state": np.array(row["observation.state"], dtype=np.float32),
-                    "task_index": int(row["task_index"]),
+                    "episode_index": int(ep_arr[j]),
+                    "frame_index": int(fr_arr[j]),
+                    "state": st_arr[j],
+                    "task_index": int(ti_arr[j]),
                     "chunk_idx": chunk_idx,
                 })
 
@@ -128,6 +138,10 @@ def main():
     for sf in sampled_frames:
         episodes_needed.add((sf["episode_index"], sf["chunk_idx"]))
     print(f"Need videos from {len(episodes_needed)} unique episodes")
+
+    ep_last_use = {}
+    for i, sf in enumerate(sampled_frames):
+        ep_last_use[(sf["episode_index"], sf["chunk_idx"])] = i
 
     print("\nDownloading video files and extracting frames...")
     frames_cache = {}
@@ -153,18 +167,21 @@ def main():
         img.save(img_path)
 
         raw_state = sf["state"]
+        assert raw_state.shape == (STATE_DIM_RAW,), f"Expected {STATE_DIM_RAW}D state, got {raw_state.shape}"
+        if i == 0:
+            pad_val = raw_state[PAD_INDEX]
+            assert pad_val == 0.0, f"state.pad (idx {PAD_INDEX}) should be 0.0, got {pad_val}"
         state_7d = np.concatenate([raw_state[:PAD_INDEX], raw_state[PAD_INDEX + 1:]])
         states_list.append(state_7d)
 
-        task_desc = tasks.get(sf["task_index"], f"task_{sf['task_index']}")
+        task_desc = tasks[sf["task_index"]]
         task_descriptions.append(task_desc)
 
         if (i + 1) % 500 == 0 or i == 0:
             print(f"  [{i+1}/{num_to_sample}] ep={sf['episode_index']} frame={sf['frame_index']} state_7d={state_7d[:3].tolist()}...")
 
-        if len(frames_cache) > 50:
-            oldest = next(iter(frames_cache))
-            del frames_cache[oldest]
+        if ep_last_use[ep_key] == i:
+            del frames_cache[ep_key]
 
     feats_B = torch.tensor(np.stack(states_list), dtype=torch.float32)
     feats_B_path = os.path.join(args.output_dir, "feats_B.pt")
@@ -179,6 +196,7 @@ def main():
         "state_keys": ["x", "y", "z", "roll", "pitch", "yaw", "gripper"],
         "dataset_repo": DATASET_REPO,
         "num_chunks_used": args.num_chunks,
+        "chunk_indices": chunk_indices,
         "seed": args.seed,
         "task_descriptions": task_descriptions,
         "episode_indices": [sf["episode_index"] for sf in sampled_frames],

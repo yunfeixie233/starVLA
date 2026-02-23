@@ -42,6 +42,7 @@ from starVLA.model.tools import FRAMEWORK_REGISTRY
 
 
 @FRAMEWORK_REGISTRY.register("QwenGR00T")
+@FRAMEWORK_REGISTRY.register("QwenFM")  # legacy name used in pre-Oct-2025 checkpoints
 class Qwen_GR00T(baseframework):
     """
     Multimodal vision-language-action model.

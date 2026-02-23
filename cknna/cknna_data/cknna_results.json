@@ -1,0 +1,68 @@
+{
+  "_meta": {
+    "timestamp": "2026-02-23 10:24:35",
+    "feats_B_path": "/home/ubuntu/verl/starVLA/cknna/cknna_data/feats_B.pt",
+    "feats_B_shape": [
+      5000,
+      7
+    ],
+    "N": 5000,
+    "k_values": [
+      5,
+      10,
+      20
+    ]
+  },
+  "models": {
+    "Qwen-OFT-Bridge-RT-1": {
+      "feats_A_path": "/home/ubuntu/verl/starVLA/cknna/cknna_data/Qwen-OFT-Bridge-RT-1/feats_A.pt",
+      "feats_A_dim": 2048,
+      "cknna_k5": 0.09959773308456767,
+      "mutual_knn_k5": 0.07692000269889832,
+      "cknna_k10": 0.07712650396911434,
+      "mutual_knn_k10": 0.06537999957799911,
+      "cknna_k20": 0.06879126302418327,
+      "mutual_knn_k20": 0.06380999833345413
+    },
+    "Qwen3VL-GR00T-Bridge-RT-1": {
+      "feats_A_path": "/home/ubuntu/verl/starVLA/cknna/cknna_data/Qwen3VL-GR00T-Bridge-RT-1/feats_A.pt",
+      "feats_A_dim": 2560,
+      "cknna_k5": 0.12155132118665506,
+      "mutual_knn_k5": 0.0899599939584732,
+      "cknna_k10": 0.09868723498267455,
+      "mutual_knn_k10": 0.07999999821186066,
+      "cknna_k20": 0.09217606676758172,
+      "mutual_knn_k20": 0.0833899974822998
+    },
+    "Qwen3VL-OFT-Bridge-RT-1": {
+      "feats_A_path": "/home/ubuntu/verl/starVLA/cknna/cknna_data/Qwen3VL-OFT-Bridge-RT-1/feats_A.pt",
+      "feats_A_dim": 2560,
+      "cknna_k5": 0.09452201136910154,
+      "mutual_knn_k5": 0.07255999743938446,
+      "cknna_k10": 0.0723624567784938,
+      "mutual_knn_k10": 0.06098000332713127,
+      "cknna_k20": 0.06496328884308021,
+      "mutual_knn_k20": 0.0597199983894825
+    },
+    "Qwen-GR00T-Bridge": {
+      "feats_A_path": "/home/ubuntu/verl/starVLA/cknna/cknna_data/Qwen-GR00T-Bridge/feats_A.pt",
+      "feats_A_dim": 2048,
+      "cknna_k5": 0.13483778348928865,
+      "mutual_knn_k5": 0.09935999661684036,
+      "cknna_k10": 0.1167626390416745,
+      "mutual_knn_k10": 0.09393999725580215,
+      "cknna_k20": 0.11205636504123045,
+      "mutual_knn_k20": 0.0987899973988533
+    },
+    "Qwen-FAST-Bridge-RT-1": {
+      "feats_A_path": "/home/ubuntu/verl/starVLA/cknna/cknna_data/Qwen-FAST-Bridge-RT-1/feats_A.pt",
+      "feats_A_dim": 2048,
+      "cknna_k5": 0.10530162126571589,
+      "mutual_knn_k5": 0.07372000068426132,
+      "cknna_k10": 0.08131132945009494,
+      "mutual_knn_k10": 0.06445999443531036,
+      "cknna_k20": 0.07421342215185961,
+      "mutual_knn_k20": 0.06486999988555908
+    }
+  }
+}
