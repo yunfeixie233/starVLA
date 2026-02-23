@@ -1,0 +1,52 @@
+========================================
+Testing: Qwen-FAST-Bridge-RT-1
+Checkpoint: /home/ubuntu/verl/starVLA/playground/Pretrained_models/Qwen-FAST-Bridge-RT-1/checkpoints/steps_10000_pytorch_model.pt
+========================================
+FAIL: Server process died
+INFO:starVLA.model.framework.share_tools:[*] Loading from local checkpoint path `/home/ubuntu/verl/starVLA/playground/Pretrained_models/Qwen-FAST-Bridge-RT-1/checkpoints/steps_10000_pytorch_model.pt`
+`torch_dtype` is deprecated! Use `dtype` instead!
+WARNING:transformers.modeling_utils:`torch_dtype` is deprecated! Use `dtype` instead!
+You are attempting to use Flash Attention 2 without specifying a torch dtype. This might lead to unexpected behaviour
+WARNING:transformers.modeling_utils:You are attempting to use Flash Attention 2 without specifying a torch dtype. This might lead to unexpected behaviour
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.11it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.68it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:01<00:00,  1.56it/s]
+Traceback (most recent call last):
+  File "/lambda/nfs/verl/conda/envs/starVLA/lib/python3.10/site-packages/transformers/utils/hub.py", line 479, in cached_files
+    hf_hub_download(
+  File "/lambda/nfs/verl/conda/envs/starVLA/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 106, in _inner_fn
+    validate_repo_id(arg_value)
+  File "/lambda/nfs/verl/conda/envs/starVLA/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 154, in validate_repo_id
+    raise HFValidationError(
+huggingface_hub.errors.HFValidationError: Repo id must be in the form 'repo_name' or 'namespace/repo_name': 'playground/Pretrained_models/fast'. Use `repo_type` argument if needed.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/lambda/nfs/verl/starVLA/deployment/model_server/server_policy.py", line 70, in <module>
+    main(args)
+  File "/lambda/nfs/verl/starVLA/deployment/model_server/server_policy.py", line 19, in main
+    vla = baseframework.from_pretrained( # TODO should auto detect framework from model path
+  File "/home/ubuntu/verl/starVLA/starVLA/model/framework/base_framework.py", line 90, in from_pretrained
+    FrameworkModel = build_framework(cfg=model_config)
+  File "/home/ubuntu/verl/starVLA/starVLA/model/framework/__init__.py", line 67, in build_framework
+    return model_class(cfg)
+  File "/home/ubuntu/verl/starVLA/starVLA/model/framework/QwenFast.py", line 74, in __init__
+    self.action_model = get_action_model(config=self.config)
+  File "/home/ubuntu/verl/starVLA/starVLA/model/modules/action_model/fast_ActionHeader.py", line 74, in get_action_model
+    action_model = Fast_Action_Tokenizer()
+  File "/home/ubuntu/verl/starVLA/starVLA/model/modules/action_model/fast_ActionHeader.py", line 29, in __init__
+    self.fast_tokenizer = AutoProcessor.from_pretrained(
+  File "/lambda/nfs/verl/conda/envs/starVLA/lib/python3.10/site-packages/transformers/models/auto/processing_auto.py", line 303, in from_pretrained
+    processor_config_file = cached_file(pretrained_model_name_or_path, PROCESSOR_NAME, **cached_file_kwargs)
+  File "/lambda/nfs/verl/conda/envs/starVLA/lib/python3.10/site-packages/transformers/utils/hub.py", line 322, in cached_file
+    file = cached_files(path_or_repo_id=path_or_repo_id, filenames=[filename], **kwargs)
+  File "/lambda/nfs/verl/conda/envs/starVLA/lib/python3.10/site-packages/transformers/utils/hub.py", line 531, in cached_files
+    resolved_files = [
+  File "/lambda/nfs/verl/conda/envs/starVLA/lib/python3.10/site-packages/transformers/utils/hub.py", line 532, in <listcomp>
+    _get_cache_file_to_return(path_or_repo_id, filename, cache_dir, revision, repo_type)
+  File "/lambda/nfs/verl/conda/envs/starVLA/lib/python3.10/site-packages/transformers/utils/hub.py", line 143, in _get_cache_file_to_return
+    resolved_file = try_to_load_from_cache(
+  File "/lambda/nfs/verl/conda/envs/starVLA/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 106, in _inner_fn
+    validate_repo_id(arg_value)
+  File "/lambda/nfs/verl/conda/envs/starVLA/lib/python3.10/site-packages/huggingface_hub/utils/_validators.py", line 154, in validate_repo_id
+    raise HFValidationError(
+huggingface_hub.errors.HFValidationError: Repo id must be in the form 'repo_name' or 'namespace/repo_name': 'playground/Pretrained_models/fast'. Use `repo_type` argument if needed.
