@@ -230,13 +230,16 @@ class ModelClient:
 
     @staticmethod
     def get_action_stats(unnorm_key: str, policy_ckpt_path) -> dict:
-        """
-        Duplicate stats accessor (retained for backward compatibility).
-        """
         policy_ckpt_path = Path(policy_ckpt_path)
-        model_config, norm_stats = read_mode_config(policy_ckpt_path)  # read config and norm_stats
+        model_config, norm_stats = read_mode_config(policy_ckpt_path)
 
-        # unnorm_key = baseframework._check_unnorm_key(norm_stats, unnorm_key) # 其实也是很环境 specific 的
+        if unnorm_key not in norm_stats:
+            candidates = [k for k in norm_stats if "bridge" in k.lower()]
+            if candidates:
+                unnorm_key = candidates[0]
+            else:
+                unnorm_key = next(iter(norm_stats))
+            print(f"[model2simpler_interface] Using unnorm_key={unnorm_key!r} (available: {list(norm_stats.keys())})")
         return norm_stats[unnorm_key]["action"]
 
 
