@@ -18,10 +18,12 @@
 
 set -euo pipefail
 
-STAR="/home/ubuntu/verl/starVLA"
-CONDA="/home/ubuntu/verl/conda"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+STAR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+WORK="$(cd "${STAR}/.." && pwd)"
+CONDA="${CONDA_ROOT:-${WORK}/conda}"
 DATA_DIR="${STAR}/cknna/cknna_data"
-COMPUTE_CKNNA="/home/ubuntu/verl/lerobot/cknna/compute_cknna.py"
+COMPUTE_CKNNA="${WORK}/lerobot/cknna/compute_cknna.py"
 
 source "${CONDA}/bin/activate" starVLA
 cd "${STAR}"

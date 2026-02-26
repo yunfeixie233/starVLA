@@ -2,13 +2,16 @@
 Phase 1: Load Bridge dataset for CKNNA evaluation.
 
 Downloads a subset of the IPEC-COMMUNITY/bridge_orig_lerobot dataset from
-HuggingFace and extracts (image, proprioceptive_state, task_description) tuples.
+HuggingFace and extracts (image, proprioceptive_state, action, task_description)
+tuples.
 
 State is 8D: [x, y, z, roll, pitch, yaw, pad, gripper].
 We drop index 6 (pad, always 0) to get 7D feats_B.
+Action is 7D: [dx, dy, dz, droll, dpitch, dyaw, dgripper].
 
 Output:
   <output_dir>/feats_B.pt        -- (N, 7) float32 state vectors
+  <output_dir>/actions.pt        -- (N, 7) float32 action vectors
   <output_dir>/images/NNNNNN.png -- individual PNG images
   <output_dir>/metadata.json     -- metadata (N, indices, tasks, ...)
 
@@ -118,11 +121,13 @@ def main():
             fr_arr = df["frame_index"].values.astype(np.int64)
             ti_arr = df["task_index"].values.astype(np.int64)
             st_arr = np.stack(df["observation.state"].values).astype(np.float32)
+            act_arr = np.stack(df["action"].values).astype(np.float32)
             for j in range(len(df)):
                 all_frames.append({
                     "episode_index": int(ep_arr[j]),
                     "frame_index": int(fr_arr[j]),
                     "state": st_arr[j],
+                    "action": act_arr[j],
                     "task_index": int(ti_arr[j]),
                     "chunk_idx": chunk_idx,
                 })
@@ -146,6 +151,7 @@ def main():
     print("\nDownloading video files and extracting frames...")
     frames_cache = {}
     states_list = []
+    actions_list = []
     task_descriptions = []
 
     for i, sf in enumerate(sampled_frames):
@@ -174,6 +180,9 @@ def main():
         state_7d = np.concatenate([raw_state[:PAD_INDEX], raw_state[PAD_INDEX + 1:]])
         states_list.append(state_7d)
 
+        raw_action = sf["action"]
+        actions_list.append(raw_action)
+
         task_desc = tasks[sf["task_index"]]
         task_descriptions.append(task_desc)
 
@@ -188,11 +197,17 @@ def main():
     torch.save(feats_B, feats_B_path)
     print(f"\nSaved feats_B: shape={tuple(feats_B.shape)} to {feats_B_path}")
 
+    actions = torch.tensor(np.stack(actions_list), dtype=torch.float32)
+    actions_path = os.path.join(args.output_dir, "actions.pt")
+    torch.save(actions, actions_path)
+    print(f"Saved actions: shape={tuple(actions.shape)} to {actions_path}")
+
     metadata = {
         "num_samples": num_to_sample,
         "state_dim_raw": STATE_DIM_RAW,
         "state_dim_effective": STATE_DIM_EFFECTIVE,
         "pad_index_dropped": PAD_INDEX,
+        "action_dim": 7,
         "state_keys": ["x", "y", "z", "roll", "pitch", "yaw", "gripper"],
         "dataset_repo": DATASET_REPO,
         "num_chunks_used": args.num_chunks,
@@ -208,8 +223,9 @@ def main():
     print(f"Saved metadata to {metadata_path}")
 
     print("\n=== Phase 1 Complete ===")
-    print(f"  feats_B: {feats_B_path}  shape={tuple(feats_B.shape)}")
-    print(f"  images:  {images_dir}/  ({num_to_sample} files)")
+    print(f"  feats_B:  {feats_B_path}  shape={tuple(feats_B.shape)}")
+    print(f"  actions:  {actions_path}  shape={tuple(actions.shape)}")
+    print(f"  images:   {images_dir}/  ({num_to_sample} files)")
     print(f"  metadata: {metadata_path}")
 
 

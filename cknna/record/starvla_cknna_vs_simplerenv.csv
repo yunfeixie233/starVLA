@@ -1,7 +1,7 @@
 Model,Base_VLM,Training_Data,CKNNA_ckpt_steps,WidowX_avg,CKNNA_k5,CKNNA_k10,CKNNA_k20,Mutual_kNN_k5,Mutual_kNN_k10,Mutual_kNN_k20
 Qwen-GR00T-Bridge,Qwen2.5-VL,Bridge_only,45k,71.4,0.1348,0.1168,0.1121,0.0994,0.0939,0.0988
+Qwen-GR00T-Bridge-RT-1,Qwen2.5-VL,Bridge+Fractal,30k,63.6,0.1237,0.1080,0.1033,0.0977,0.0920,0.0949
 Qwen3VL-GR00T-Bridge-RT-1,Qwen3-VL,Bridge+Fractal,20k,65.3,0.1216,0.0987,0.0922,0.0900,0.0800,0.0834
-Qwen2.5-GR00T-Bridge-RT-1,Qwen2.5-VL,Bridge+Fractal,N/A,63.6,N/A,N/A,N/A,N/A,N/A,N/A
 Qwen2.5-PI-Bridge-RT-1,Qwen2.5-VL,Bridge+Fractal,N/A,62.5,N/A,N/A,N/A,N/A,N/A,N/A
 Qwen2.5-FAST-Bridge-RT-1,Qwen2.5-VL,Bridge+Fractal,10k,58.6,0.1053,0.0813,0.0742,0.0737,0.0645,0.0649
 Qwen3VL-OFT-Bridge-RT-1,Qwen3-VL,Bridge+Fractal,5k(mismatch),42.7,0.0945,0.0724,0.0650,0.0726,0.0610,0.0597

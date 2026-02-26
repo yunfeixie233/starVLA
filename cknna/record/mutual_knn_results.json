@@ -1,0 +1,90 @@
+{
+  "Qwen-GR00T-Bridge": {
+    "mknn_action_k5": 0.0928799957036972,
+    "mknn_action_k10": 0.09651999920606613,
+    "mknn_action_k20": 0.10439999401569366,
+    "mknn_proprio_k5": 0.09935999661684036,
+    "mknn_proprio_k10": 0.09393999725580215,
+    "mknn_proprio_k20": 0.0987899973988533
+  },
+  "Qwen-GR00T-Bridge-RT-1": {
+    "mknn_action_k5": 0.04479999840259552,
+    "mknn_action_k10": 0.04938000440597534,
+    "mknn_action_k20": 0.05855000019073486,
+    "mknn_proprio_k5": 0.09771999716758728,
+    "mknn_proprio_k10": 0.09202000498771667,
+    "mknn_proprio_k20": 0.09493999928236008
+  },
+  "Qwen3VL-GR00T-Bridge-RT-1": {
+    "mknn_action_k5": 0.07248000055551529,
+    "mknn_action_k10": 0.0731000006198883,
+    "mknn_action_k20": 0.08069999516010284,
+    "mknn_proprio_k5": 0.0899599939584732,
+    "mknn_proprio_k10": 0.07999999821186066,
+    "mknn_proprio_k20": 0.0833899974822998
+  },
+  "Qwen-FAST-Bridge-RT-1": {
+    "mknn_action_k5": 0.0400799997150898,
+    "mknn_action_k10": 0.04182000085711479,
+    "mknn_action_k20": 0.04457999765872955,
+    "mknn_proprio_k5": 0.07372000068426132,
+    "mknn_proprio_k10": 0.06445999443531036,
+    "mknn_proprio_k20": 0.06486999988555908
+  },
+  "Qwen-OFT-Bridge-RT-1": {
+    "mknn_action_k5": 0.207519993185997,
+    "mknn_action_k10": 0.19120000302791595,
+    "mknn_action_k20": 0.18298999965190887,
+    "mknn_proprio_k5": 0.07692000269889832,
+    "mknn_proprio_k10": 0.06537999957799911,
+    "mknn_proprio_k20": 0.06380999833345413
+  },
+  "Qwen3VL-OFT-Bridge-RT-1": {
+    "mknn_action_k5": 0.17747999727725983,
+    "mknn_action_k10": 0.16874000430107117,
+    "mknn_action_k20": 0.1704300045967102,
+    "mknn_proprio_k5": 0.07255999743938446,
+    "mknn_proprio_k10": 0.06098000332713127,
+    "mknn_proprio_k20": 0.0597199983894825
+  },
+  "spatialvla-sft-bridge": {
+    "mknn_action_k5": 0.1358400136232376,
+    "mknn_action_k10": 0.1136000007390976,
+    "mknn_action_k20": 0.10728999972343445,
+    "mknn_proprio_k5": 0.08576000481843948,
+    "mknn_proprio_k10": 0.07500000298023224,
+    "mknn_proprio_k20": 0.07154999673366547
+  },
+  "pi0-lerobot-bridge": {
+    "mknn_action_k5": 0.4264799654483795,
+    "mknn_action_k10": 0.4267999827861786,
+    "mknn_action_k20": 0.441059947013855,
+    "mknn_proprio_k5": 0.0575999990105629,
+    "mknn_proprio_k10": 0.04312000051140785,
+    "mknn_proprio_k20": 0.037620000541210175
+  },
+  "openvla-7b-bridge": {
+    "mknn_action_k5": 0.2590799629688263,
+    "mknn_action_k10": 0.23666000366210938,
+    "mknn_action_k20": 0.2267799973487854,
+    "mknn_proprio_k5": 0.07727999985218048,
+    "mknn_proprio_k10": 0.06650000065565109,
+    "mknn_proprio_k20": 0.06452000886201859
+  },
+  "RT-1-X": {
+    "mknn_action_k5": 1.0,
+    "mknn_proprio_k5": 0.08212000876665115,
+    "mknn_action_k10": 1.0,
+    "mknn_proprio_k10": 0.07586000114679337,
+    "mknn_action_k20": 1.0,
+    "mknn_proprio_k20": 0.07909999787807465
+  },
+  "Octo-base": {
+    "mknn_action_k5": 1.0,
+    "mknn_proprio_k5": 0.08760000020265579,
+    "mknn_action_k10": 1.0,
+    "mknn_proprio_k10": 0.08083999902009964,
+    "mknn_action_k20": 1.0,
+    "mknn_proprio_k20": 0.08162000775337219
+  }
+}
