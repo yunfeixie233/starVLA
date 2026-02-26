@@ -43,11 +43,12 @@ echo "========================================"
 # 1a. StarVLA
 if [ ! -d "${WORK}/starVLA/.git" ]; then
     git clone https://github.com/yunfeixie233/starVLA.git "${WORK}/starVLA"
+    cd "${WORK}/starVLA" && git checkout starVLA && cd "${WORK}"
 fi
 
 # 1b. SimplerEnv-OpenVLA
 if [ ! -d "${WORK}/SimplerEnv-OpenVLA/.git" ]; then
-    git clone https://github.com/DelinQu/SimplerEnv-OpenVLA.git "${WORK}/SimplerEnv-OpenVLA"
+    git clone https://github.com/yunfeixie233/SimplerEnv-OpenVLA.git "${WORK}/SimplerEnv-OpenVLA"
     cd "${WORK}/SimplerEnv-OpenVLA"
     git submodule update --init --recursive
     cd "${WORK}"
@@ -70,9 +71,10 @@ if [ ! -d "${WORK}/openvla/.git" ]; then
     git clone https://github.com/openvla/openvla.git "${WORK}/openvla"
 fi
 
-# 1f. Isaac-GR00T (N1.5)
+# 1f. Isaac-GR00T (N1.5) -- fork with Bridge embodiment tag
 if [ ! -d "${WORK}/Isaac-GR00T/.git" ]; then
-    git clone https://github.com/NVIDIA/Isaac-GR00T.git "${WORK}/Isaac-GR00T"
+    git clone https://github.com/yunfeixie233/Isaac-GR00T.git "${WORK}/Isaac-GR00T"
+    cd "${WORK}/Isaac-GR00T" && git checkout cknna-bridge && cd "${WORK}"
 fi
 
 # 1g. Isaac-GR00T (N1.6 -- separate directory)
