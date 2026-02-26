@@ -27,6 +27,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 WORK="${WORK:-$(cd "${SCRIPT_DIR}/../.." && pwd)}"
 CONDA_ROOT="${CONDA_ROOT:-${WORK}/conda}"
+export WORK CONDA_ROOT
 CONDA="${CONDA_ROOT}/bin/conda"
 
 mkdir -p "${WORK}"
@@ -151,7 +152,12 @@ echo "Patching StarVLA checkpoint config.yaml base_vlm paths..."
 for name in "${!STARVLA_HF_REPOS[@]}"; do
     cfg="${PRETRAINED}/${name}/config.yaml"
     if [ -f "${cfg}" ]; then
-        sed -i "s|base_vlm:.*|base_vlm: ${PRETRAINED}/\$(basename \$(grep -oP 'base_vlm: \\K.*' ${cfg}))|" "${cfg}" 2>/dev/null || true
+        old_vlm=$(grep -oP 'base_vlm:\s*\K\S+' "${cfg}" 2>/dev/null || true)
+        if [ -n "${old_vlm}" ]; then
+            vlm_basename=$(basename "${old_vlm}")
+            sed -i "s|base_vlm:.*|base_vlm: ${PRETRAINED}/${vlm_basename}|" "${cfg}"
+            echo "  ${name}: base_vlm -> ${PRETRAINED}/${vlm_basename}"
+        fi
     fi
 done
 
@@ -297,16 +303,17 @@ else
     echo "groot_libero env already exists."
 fi
 
-# ---------- 3f. pi0fast_env (inherits from groot_libero) ----------
+# ---------- 3f. pi0fast_env (for Pi0 lerobot models) ----------
 if ! ${CONDA} env list | grep -q "pi0fast_env"; then
-    echo "Creating pi0fast_env (venv inheriting groot_libero)..."
-    GROOT_PYTHON="${CONDA_ROOT}/envs/groot_libero/bin/python"
-    ${GROOT_PYTHON} -m venv --system-site-packages "${CONDA_ROOT}/envs/pi0fast_env"
-    source "${CONDA_ROOT}/envs/pi0fast_env/bin/activate"
+    echo "Creating pi0fast_env..."
+    ${CONDA} create -n pi0fast_env python=3.10 -y
+    source "${CONDA_ROOT}/bin/activate" pi0fast_env
+    pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+    cd "${WORK}/lerobot"
+    pip install -e ".[groot]"
+    pip install h5py
     pip install "transformers @ git+https://github.com/huggingface/transformers.git@fix/lerobot_openpi"
-    deactivate
-    # Register as a conda env for easy activation
-    ${CONDA} create -n pi0fast_env --clone "${CONDA_ROOT}/envs/pi0fast_env" 2>/dev/null || true
+    cd "${WORK}"
 else
     echo "pi0fast_env env already exists."
 fi
