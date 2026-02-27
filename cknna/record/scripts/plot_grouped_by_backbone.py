@@ -17,7 +17,6 @@ Uses adjustText for automatic label repositioning to avoid overlaps.
 """
 import csv
 import os
-import time
 
 import matplotlib
 matplotlib.use("Agg")
@@ -26,11 +25,12 @@ import numpy as np
 from adjustText import adjust_text
 from scipy.stats import spearmanr
 
+
 csv_path = os.path.join(os.path.dirname(__file__), "..", "cknna_action_proprio_simplerenv.csv")
 with open(csv_path) as f:
     rows_all = list(csv.DictReader(f))
 
-EXCLUDE_ALWAYS = {"openvla-7b-bridge"}
+EXCLUDE_ALWAYS = set()
 PRE_VLM = {"RT-1-X", "Octo-base"}
 
 GROUPS = [
@@ -57,11 +57,13 @@ GROUPS = [
         },
     },
     {
-        "label": "Prismatic+Llama2-7B (CogACT)",
+        "label": "Prismatic+Llama2-7B (OpenVLA / CogACT)",
         "color": "#ff7f0e",
         "marker": "D",
         "size": 85,
         "models": {
+            "openvla-7b-bridge",
+            "openvla-7b-bridge-ft-200k",
             "CogACT-Small",
             "CogACT-Base",
             "CogACT-Large",
@@ -105,6 +107,8 @@ DISPLAY_NAME = {
     "Qwen3-OFT-Bridge-RT-1": "Qwen3-OFT-Bridge-RT-1",
     "spatialvla-sft-bridge": "SpatialVLA",
     "pi0-lerobot-bridge": "Pi0",
+    "openvla-7b-bridge": "OpenVLA-Base",
+    "openvla-7b-bridge-ft-200k": "OpenVLA-FT-200k",
     "CogACT-Small": "CogACT-Small",
     "CogACT-Base": "CogACT-Base",
     "CogACT-Large": "CogACT-Large",
@@ -126,8 +130,7 @@ panels = [
     ("MutualKNN_action_k%d" % k, "Mutual k-NN (VLM, Action)  k=%d" % k),
 ]
 
-timestamp = time.strftime("%Y%m%d_%H%M%S")
-outdir = os.path.join(os.path.dirname(__file__), "..", "runs", timestamp)
+outdir = os.path.join(os.path.dirname(__file__), "..", "runs", "20260224_212656")
 os.makedirs(outdir, exist_ok=True)
 
 
@@ -163,6 +166,8 @@ for fig_tag, exclude_set in FIGURE_SETS:
             for r in rows:
                 name = r["Model"]
                 if name not in grp["models"]:
+                    continue
+                if r[col] == "N/A" or r["WidowX_avg_entire"] == "N/A":
                     continue
                 x = float(r["WidowX_avg_entire"])
                 y = float(r[col])

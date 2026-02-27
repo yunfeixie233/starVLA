@@ -118,7 +118,7 @@ def get_args():
     parser.add_argument("--async-freq", type=int, default=1)
     parser.add_argument("--host", type=str, default="127.0.0.1", help="Octo init rng seed")
     parser.add_argument("--port", type=int, default=10093)
-
+    parser.add_argument("--save-rollout-dir", type=str, default=None, help="Directory to save rollout data for CKNNA")
 
     args = parser.parse_args()
 
