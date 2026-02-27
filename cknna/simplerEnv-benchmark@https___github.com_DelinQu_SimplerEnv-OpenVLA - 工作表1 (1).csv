@@ -1,0 +1,43 @@
+WidowX Robot,checkpoints,Spoon on cloth partial,Spoon on cloth entire,Carrot on plate partial,Carrot on plate entire,Stack partial,Stack entire,Eggplant in basket partial,Eggplant in basket entire,Avg-entire,Avg-all,,,,,,,,,,
+RT-1-X,,4.20%,0,16.70%,0,0,0,3.30%,0,0,3.03%,,,,,,,,,,
+Octo,,50%,33%,50%,25%,29.20%,0,40%,23.30%,20%,31%,,,,,,,,,,
+OpenVLA,https://huggingface.co/openvla/openvla-7b,4.10%,0,33%,0,12.50%,0,8.30%,4.10%,0.01025,7.75%,,,,,,,,,,
+RoboVLM,https://huggingface.co/robovlms/RoboVLMs,37.50%,20.80%,33.30%,25.00%,8.30%,8.30%,0,0,13.53%,16.65%,,,,,,,,,,
+SpatialVLA,https://huggingface.co/collections/IPEC-COMMUNITY/foundation-vision-language-action-model-6795eb96a9c661f90236acbb,20.80%,16.70%,29.20%,25.00%,62.50%,29.20%,100%,100%,42.73%,47.93%,,,,,,,,,,
+openpi0,https://huggingface.co/HaomingSong,45.80%,29.10%,25.00%,0%,50.00%,16.60%,91.60%,62.50%,27.05%,40.08%,,,,,,,,,,
+openpi0-fast,https://huggingface.co/HaomingSong,62.50%,29.10%,58.50%,21.90%,54.00%,10.80%,83.30%,66.60%,32.10%,48.34%,,,,,,,,,,
+lerobot-pi0,https://huggingface.co/HaomingSong,66.67%,50.00%,62.50%,41.67%,58.33%,29.17%,83.33%,70.83%,47.92%,57.81%,,,,,,,,,,
+openpi-zero,https://github.com/allenzren/open-pi-zero (unofficial implementation and evaluation),,84.60%,,55.80%,,47.90%,,85.40%,68.43%,0.68425,,,,,,,,,,
+GR00T,I AM TRING BY BEST TO SEARCH PARAMS (Jul 8),,,,,,,,,#DIV/0!,#DIV/0!,,,,,,,,,,
+,,,,,,,,,,#DIV/0!,#DIV/0!,,,,,,,,,,
+hume,,,,,,,,,,#DIV/0!,#DIV/0!,,,,,,,,,,
+@contrib,,,,,,,,,,#DIV/0!,#DIV/0!,,,,,,,,,,
+,,,,,,,,,,#DIV/0!,#DIV/0!,,,,,,,,,,
+,,,,,,,,,,#DIV/0!,#DIV/0!,,,,,,,,,,
+,,,,,,,,,,#DIV/0!,#DIV/0!,,,,,,,,,,
+,,,,,,,,,,#DIV/0!,#DIV/0!,,,,,,,,,,
+,,,,,,,,,,#DIV/0!,#DIV/0!,,,,,,,,,,
+,,,,,,,,,,#DIV/0!,#DIV/0!,,,,,,,,,,
+,,,,,,,,,,#DIV/0!,#DIV/0!,,,,,,,,,,
+,,,,,,,,,,#DIV/0!,#DIV/0!,,,,,,,,,,
+,,,,,,,,,,#DIV/0!,#DIV/0!,,,,,,,,,,
+,,,,,,,,,,#DIV/0!,#DIV/0!,,,,,,,,,,
+,,,,,,,,,,#DIV/0!,#DIV/0!,,,,,,,,,,
+Google Robot,,coke can matching,,,,coke can variant,,,,move near,,drawer matching,,,drawer variant,,,apple in drawer,,#all,
+,checkpoints,horizontal,vertical,standing,avg,horizontal,vertical,standing,avg,matching,variant,open,close,avg,open,close,avg,matching,variant,match avg,agg avg
+RT-1 (Converged),,0.96,0.88,0.72,0.853,0.969,0.76,0.964,0.898,0.633,0.5,0.815,0.926,0.87,0.27,0.376,0.323,0.065,0.026,0.60525,0.43675
+RT-1 (15%),,1,0.96,0.8,0.92,0.92,0.704,0.813,0.813,0.583,0.446,0.704,0.889,0.796,0.212,0.323,0.267,0.13,0.021,0.60725,0.38675
+RT-1-X,,0.88,0.56,0.84,0.76,0.569,0.204,0.698,0.49,0.45,0.323,0.519,0.741,0.63,0.069,0.519,0.294,0.037,0.101,0.46925,0.302
+RT-2-X,,0.92,0.8,1,0.907,0.822,0.754,0.893,0.823,0.733,0.792,0.333,0.63,0.481,0.333,0.372,0.353,0,0.206,0.53025,0.5435
+Octo,,0.44,0.2,0.24,0.293,0.005,0,0.013,0.006,0.35,0.031,0.148,0.519,0.333,0,0.021,0.011,0,0,0.244,0.012
+OpenVLA,https://huggingface.co/openvla/openvla-7b,27.00%,3.00%,19.00%,16.30%,71.10%,27.10%,65.30%,54.50%,46.20%,47.70%,19.40%,51.80%,35.60%,15.80%,19.50%,17.70%,0,0,24.53%,29.98%
+RoboVLM,https://huggingface.co/robovlms/RoboVLMs,94.00%,47.00%,91.00%,77.30%,93.80%,49.80%,83.10%,75.60%,61.70%,60.00%,33.30%,53.10%,43.50%,2.60%,18.50%,10.60%,,,60.83%,48.73%
+SpatialVLA,https://huggingface.co/collections/IPEC-COMMUNITY/foundation-vision-language-action-model-6795eb96a9c661f90236acbb,85.00%,76.00%,97.00%,86.00%,93.30%,78.20%,92.40%,88.00%,77.90%,72.70%,50.00%,64.80%,57.40%,28.60%,55.00%,41.80%,,,73.77%,67.50%
+openpi0,https://huggingface.co/HaomingSong,76.00%,57.00%,85.10%,72.70%,82.00%,58.00%,85.60%,75.20%,65.30%,63.70%,30.00%,46.60%,38.30%,18.00%,33.20%,25.60%,,,58.77%,54.83%
+openpi0-fast,https://huggingface.co/HaomingSong,79.00%,61.00%,85.90%,75.30%,84.00%,63.00%,85.80%,77.60%,67.50%,68.20%,34.00%,51.80%,42.90%,24.00%,38.60%,31.30%,,,61.90%,59.03%
+lerobot-pi0,https://huggingface.co/HaomingSong,0.71,0.84,0.54,,,,,,,,0.3518518519,0.9074074074,0.6296296296,,,,0.4083333333,,0.4632716049,0.9074074074
+openpi-zero,https://github.com/allenzren/open-pi-zero (unofficial implementation and evaluation),,,,97.9,,,,,78.7,,49.5,75,62.25,,,,46.6,,71.3625,#DIV/0!
+,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,
+hume,,,,,,,,,,,,,,,,,,,,,
+@contrib,,,,,,,,,,,,,,,,,,,,,

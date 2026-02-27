@@ -159,17 +159,25 @@ def mutual_knn_lowmem(feats_A, feats_B, topk=10):
 
 
 def _load_feats_B(args):
-    """Load feats_B, handling both single-timestep and sequential (temporal) modes."""
+    """Load feats_B, handling both single-timestep and sequential (temporal) modes.
+
+    Temporal slicing is controlled by --horizon_start and --horizon:
+      slice = seq[:, horizon_start : horizon + 1, :]
+    Default (horizon_start=0): inclusive window [t, t+1, ..., t+a].
+    Future-only (horizon_start=1): exclusive window [t+1, ..., t+a].
+    """
     if args.feats_B_seq is not None:
         seq = torch.load(args.feats_B_seq, weights_only=True).float()
         a = args.horizon
+        s = args.horizon_start
         max_h = seq.shape[1] - 1
         assert a <= max_h, f"horizon {a} exceeds max available {max_h}"
-        sliced = seq[:, :a + 1, :]
+        assert s <= a, f"horizon_start {s} must be <= horizon {a}"
+        sliced = seq[:, s:a + 1, :]
         flat = sliced.reshape(sliced.shape[0], -1)
         source_path = args.feats_B_seq
         print(f"feats_B_seq: {source_path}  raw shape={tuple(seq.shape)}")
-        print(f"  horizon a={a}: sliced to {tuple(sliced.shape)}, flattened to {tuple(flat.shape)}")
+        print(f"  horizon [{s}..{a}]: sliced to {tuple(sliced.shape)}, flattened to {tuple(flat.shape)}")
         del seq, sliced
         return flat, source_path
     feats_B_raw = torch.load(args.feats_B, weights_only=True).float()
@@ -184,7 +192,10 @@ def main():
     parser.add_argument("--feats_B_seq", type=str, default=None,
                         help="Path to feats_B_seq.pt or actions_seq.pt (N, H+1, D) for temporal mode")
     parser.add_argument("--horizon", type=int, default=0,
-                        help="Temporal horizon a: use states/actions from t to t+a (requires --feats_B_seq)")
+                        help="Temporal horizon a: upper bound (inclusive) of timestep slice (requires --feats_B_seq)")
+    parser.add_argument("--horizon_start", type=int, default=0,
+                        help="Temporal horizon start: lower bound (inclusive) of timestep slice. "
+                             "Default 0 = include t. Set to 1 for future-only [t+1..t+a].")
     parser.add_argument("--topk", type=int, nargs="+", default=[10])
     parser.add_argument("--also_mutual_knn", action="store_true")
     parser.add_argument("--device", type=str, default="cuda")
@@ -193,9 +204,11 @@ def main():
 
     assert args.feats_B is not None or args.feats_B_seq is not None, \
         "Provide either --feats_B (single timestep) or --feats_B_seq (temporal)"
-    if args.horizon > 0:
+    if args.horizon > 0 or args.horizon_start > 0:
         assert args.feats_B_seq is not None, \
-            "--horizon > 0 requires --feats_B_seq"
+            "--horizon/--horizon_start requires --feats_B_seq"
+    assert args.horizon_start <= args.horizon, \
+        f"--horizon_start ({args.horizon_start}) must be <= --horizon ({args.horizon})"
 
     feats_B_raw, feats_B_source = _load_feats_B(args)
     feats_B_norm = F.normalize(feats_B_raw, p=2, dim=-1).to(args.device)
@@ -214,6 +227,7 @@ def main():
             "feats_B_path": feats_B_source,
             "feats_B_shape": list(feats_B_norm.shape),
             "N": N,
+            "horizon_start": args.horizon_start,
             "horizon": args.horizon,
             "k_values": args.topk,
             "memory_optimized": True,
