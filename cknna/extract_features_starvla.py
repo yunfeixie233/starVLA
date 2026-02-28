@@ -30,6 +30,9 @@ if STARVLA_ROOT not in sys.path:
     sys.path.insert(0, STARVLA_ROOT)
 
 
+IMAGE_TOKEN_INDEX = 151655
+
+
 def masked_mean_pool(hidden_states, attention_mask):
     """Mean-pool hidden states over valid (non-padding) tokens.
 
@@ -45,20 +48,40 @@ def masked_mean_pool(hidden_states, attention_mask):
     return (h * m).sum(dim=1) / m.sum(dim=1).clamp(min=1)
 
 
-def extract_feat_a(model, images_pil, instruction):
-    """Run VLM prefill and extract mean-pooled last hidden state.
+def find_subsequence(seq, subseq):
+    n, m = len(seq), len(subseq)
+    if m == 0:
+        return -1
+    for i in range(n - m + 1):
+        if seq[i:i + m] == subseq:
+            return i
+    return -1
 
-    This function is shared across all 4 StarVLA frameworks.
-    It calls qwen_vl_interface directly, without going through
-    the framework's forward() or predict_action() methods.
 
-    Args:
-        model: A loaded StarVLA framework instance (already on device).
-        images_pil: List[PIL.Image] for a single sample (e.g., [img_0]).
-        instruction: str task instruction.
+def build_task_mask(input_ids_1d, tokenizer, task):
+    """Build mask for task-instruction tokens in the input sequence.
+
+    Tries bare encoding first (handles SentencePiece/BPE after non-space chars
+    like <bos> or newline), then falls back to space-prefixed encoding.
+    """
+    mask = torch.zeros(len(input_ids_1d), dtype=torch.long, device=input_ids_1d.device)
+    if not task:
+        return mask
+    ids_list = input_ids_1d.tolist()
+    for prefix in ["", " "]:
+        task_ids = tokenizer.encode(prefix + task, add_special_tokens=False)
+        start = find_subsequence(ids_list, task_ids)
+        if start >= 0:
+            mask[start:start + len(task_ids)] = 1
+            return mask
+    return mask
+
+
+def extract_feat_a(model, images_pil, instruction, tokenizer):
+    """Run VLM prefill and extract 3 mean-pooled hidden state variants.
 
     Returns:
-        feat_a: (D,) float32 tensor on CPU.
+        (feat_imgtext, feat_img, feat_txt) -- each (D,) float32 on CPU.
     """
     qwen_inputs = model.qwen_vl_interface.build_qwenvl_inputs(
         images=[images_pil],
@@ -74,8 +97,17 @@ def extract_feat_a(model, images_pil, instruction):
 
     last_hidden = outputs.hidden_states[-1]
     attention_mask = qwen_inputs["attention_mask"]
-    pooled = masked_mean_pool(last_hidden, attention_mask)
-    return pooled.squeeze(0).cpu()
+    input_ids = qwen_inputs["input_ids"]
+
+    feat_imgtext = masked_mean_pool(last_hidden, attention_mask).squeeze(0).cpu()
+
+    image_mask = (input_ids == IMAGE_TOKEN_INDEX).to(attention_mask.dtype)
+    feat_img = masked_mean_pool(last_hidden, image_mask).squeeze(0).cpu()
+
+    task_mask = build_task_mask(input_ids[0], tokenizer, instruction).unsqueeze(0)
+    feat_txt = masked_mean_pool(last_hidden, task_mask).squeeze(0).cpu()
+
+    return feat_imgtext, feat_img, feat_txt
 
 
 def main():
@@ -107,54 +139,50 @@ def main():
 
     framework_class = type(model).__name__
     vlm_hidden_size = model.qwen_vl_interface.model.config.hidden_size
+    tokenizer = model.qwen_vl_interface.processor.tokenizer
     print(f"  Framework: {framework_class}")
     print(f"  VLM hidden size: {vlm_hidden_size}")
     print(f"  Samples to process: {num_samples}")
 
-    partial_path = os.path.join(args.output_dir, "feats_A_partial.pt")
-    if args.resume_from > 0 and os.path.exists(partial_path):
-        partial_tensor = torch.load(partial_path, weights_only=True)
-        feats_list = list(partial_tensor[:args.resume_from])
-        print(f"  Resuming from sample {args.resume_from} ({len(feats_list)} loaded)")
-    else:
-        feats_list = []
-        args.resume_from = 0
+    feats_imgtext_list = []
+    feats_img_list = []
+    feats_txt_list = []
 
     t0 = time.time()
-    for i in range(args.resume_from, num_samples):
+    for i in range(num_samples):
         img_path = os.path.join(images_dir, f"{i:06d}.png")
         img = Image.open(img_path).convert("RGB")
 
         instruction = task_descriptions[i]
 
-        feat_a = extract_feat_a(model, [img], instruction)
-        feats_list.append(feat_a)
+        f_imgtext, f_img, f_txt = extract_feat_a(model, [img], instruction, tokenizer)
+        feats_imgtext_list.append(f_imgtext)
+        feats_img_list.append(f_img)
+        feats_txt_list.append(f_txt)
 
         if (i + 1) % 100 == 0 or i == 0:
             elapsed = time.time() - t0
-            rate = (i + 1 - args.resume_from) / elapsed if elapsed > 0 else 0
+            rate = (i + 1) / elapsed if elapsed > 0 else 0
             eta = (num_samples - i - 1) / rate if rate > 0 else 0
-            print(f"  [{i+1}/{num_samples}]  feat_a shape=({vlm_hidden_size},)  "
-                  f"rate={rate:.1f} samples/s  ETA={eta/60:.1f}min")
+            print(f"  [{i+1}/{num_samples}]  shape=({vlm_hidden_size},)  "
+                  f"rate={rate:.1f}/s  ETA={eta/60:.1f}min")
 
-        if (i + 1) % 500 == 0:
-            partial = torch.stack(feats_list)
-            torch.save(partial, partial_path)
-
-    feats_A = torch.stack(feats_list)
-    feats_A_path = os.path.join(args.output_dir, "feats_A.pt")
-    torch.save(feats_A, feats_A_path)
-
-    if os.path.exists(partial_path):
-        os.remove(partial_path)
+    for suffix, flist in [("feats_A", feats_imgtext_list),
+                          ("feats_A_img", feats_img_list),
+                          ("feats_A_txt", feats_txt_list)]:
+        t = torch.stack(flist)
+        p = os.path.join(args.output_dir, f"{suffix}.pt")
+        torch.save(t, p)
+        print(f"  Saved {p}  shape={tuple(t.shape)}")
 
     extraction_meta = {
         "checkpoint": args.ckpt_path,
         "framework": framework_class,
         "vlm_hidden_size": vlm_hidden_size,
-        "feats_A_shape": list(feats_A.shape),
         "num_samples": num_samples,
         "data_dir": args.data_dir,
+        "outputs": ["feats_A.pt", "feats_A_img.pt", "feats_A_txt.pt"],
+        "image_token_index": IMAGE_TOKEN_INDEX,
     }
     meta_path = os.path.join(args.output_dir, "extraction_metadata.json")
     with open(meta_path, "w") as f:
@@ -162,7 +190,6 @@ def main():
 
     elapsed = time.time() - t0
     print(f"\n=== Phase 2 Complete ===")
-    print(f"  feats_A: {feats_A_path}  shape={tuple(feats_A.shape)}")
     print(f"  Time: {elapsed/60:.1f} min  ({elapsed/num_samples:.2f} s/sample)")
 
 
